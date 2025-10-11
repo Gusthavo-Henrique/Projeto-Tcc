@@ -1,0 +1,17 @@
+# Ambientes virtuais e dependências
+venv/
+__pycache__/
+
+# Arquivos de ambiente e tokens
+.env
+token_cache.json
+*.key
+*.pem
+
+# Logs e arquivos temporários
+*.log
+
+# Arquivos do Word/PDF de saída
+Anexos/
+Certificação_Gerada/
+processados/
