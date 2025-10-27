@@ -11,7 +11,7 @@ download_attachments()
 # Caminhos principais 
 attachments_dir = Path(r'C:\Users\gusth\OneDrive\Documentos\Auto-Certificação-nf\Anexos')
 output_dir = Path(r'C:\Users\gusth\OneDrive\Documentos\Auto-Certificação-nf\Certificação_Gerada')
-template_path = Path(r'C:\Users\gusth\OneDrive\Documentos\Auto-Certificação-nf\DocxPython\template\Certificaçãoteste.docx')
+template_path = Path(r'C:\Users\gusth\OneDrive\Documentos\Auto-Certificação-nf\DocxPython\template\template_certificacao.docx')
 processed_dir = attachments_dir / "processados"
 
 # Cria pasta de saída e de processados se não existirem
