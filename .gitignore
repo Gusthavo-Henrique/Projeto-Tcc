@@ -1,17 +1,49 @@
 # Ambientes virtuais e dependências
 venv/
+venv*/
+.env
 __pycache__/
+*.py[cod]
+*.pyo
 
 # Arquivos de ambiente e tokens
 .env
+.env.*
 token_cache.json
 *.key
 *.pem
+credentials.json
 
 # Logs e arquivos temporários
 *.log
+*.tmp
+*.swp
 
-# Arquivos do Word/PDF de saída
+# Test / lint / coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.cache/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos do Word/PDF de saída (se quiser ignorar os resultados gerados)
 Anexos/
 Certificação_Gerada/
 processados/

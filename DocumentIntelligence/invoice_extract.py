@@ -1,20 +1,40 @@
 import base64
 from pathlib import Path
-from azure.ai.documentintelligence.models import AnalyzeDocumentRequest 
+from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
 from DocumentIntelligence.utility import client, load_file_as_base64
 
-#Função que vai ser usada no main.py para extrair os dados das notas fiscais
-def extract_invoice_data(file_path: str, model_id: str = "prebuilt-invoice") -> dict:
+
+def _get_field_value(field):
     """
-    Lê uma nota fiscal de serviço usando o Azure Document Intelligence
-    e retorna as informações extraídas como um dicionário.
+    Extrai o valor real de um campo retornado pelo Azure Document Intelligence,
+    tratando diferentes tipos de objetos (DocumentField, dict, etc.).
+    """
+    if field is None:
+        return ""
+    # Se for um objeto com atributo 'content'
+    if hasattr(field, "content") and getattr(field, "content"):
+        return getattr(field, "content")
+    # Se for um objeto com atributo 'value'
+    if hasattr(field, "value") and getattr(field, "value"):
+        return getattr(field, "value")
+    # Se for dicionário
+    if isinstance(field, dict):
+        return field.get("content") or field.get("value") or ""
+    # Caso seja valor simples
+    return str(field)
+
+
+def extract_invoice_data(file_path: str, model_id: str = "sapiens2015415tcc") -> dict:
+    """
+    Extrai dados de uma nota fiscal de serviço usando o modelo customizado do Azure Document Intelligence.
+    Retorna os campos definidos no treinamento do modelo.
 
     Args:
         file_path (str): Caminho do arquivo PDF.
-        model_id (str): ID do modelo do Azure (padrão: 'prebuilt-invoice').
+        model_id (str): ID do modelo customizado no Azure.
 
     Returns:
-        dict: Dados estruturados da nota fiscal.
+        dict: Dados estruturados com os campos personalizados.
     """
     document_intelligence_client = client()
 
@@ -31,22 +51,17 @@ def extract_invoice_data(file_path: str, model_id: str = "prebuilt-invoice") -> 
         raise ValueError("Nenhum documento detectado no arquivo.")
 
     document = result.documents[0]
-    fields = document['fields']
+    fields = document.fields
 
+    # Usa a função segura para pegar o valor de cada campo
     data = {
-        "InvoiceId": fields.get("InvoiceId", {}).get("content", ""),
-        "InvoiceTotal": fields.get("InvoiceTotal", {}).get("content", ""),
-        "InvoiceDate": fields.get("InvoiceDate", {}).get("content", ""),
-        "DueDate": fields.get("DueDate", {}).get("content", ""),
-        "Items": []
+        "numerodanota": _get_field_value(fields.get("numerodanota")),
+        "valordanota": _get_field_value(fields.get("valordanota")),
+        "datadeemissao": _get_field_value(fields.get("datadeemissao")),
+        "fornecedor": _get_field_value(fields.get("fornecedor")),
+        "mesdopagamento": _get_field_value(fields.get("mesdopagamento")),
+        "descricaodoservico": _get_field_value(fields.get("descricaodoservico")),
+        "datadevencimento": _get_field_value(fields.get("datadevencimento")),
     }
 
-    # Extrair lista de itens, se existir
-    if "Items" in fields:
-        for item in fields["Items"]["valueArray"]:
-            item_obj = item["valueObject"]
-            item_dict = {k: v.get("content", "") for k, v in item_obj.items()}
-            data["Items"].append(item_dict)
-
     return data
-
